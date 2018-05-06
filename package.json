@@ -1,0 +1,26 @@
+{
+  "name": "mississauga-dolphins-admin",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "firebase": "^4.13.1",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-saga": "^0.16.0"
+  },
+  "devDependencies": {
+    "react-scripts": "1.1.4",
+    "remote-redux-devtools": "^0.5.12",
+    "remote-redux-devtools-on-debugger": "^0.8.3",
+    "remotedev-server": "^0.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "remotedev": "babel-node scripts/remotedevServer.js"
+  }
+}
