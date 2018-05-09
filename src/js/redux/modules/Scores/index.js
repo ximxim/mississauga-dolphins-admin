@@ -64,19 +64,39 @@ export default function reducer(state = initialState, action) {
             error: action.payload,
         };
     }
-    case UPDATE_GAME, FINISH_GAME: {
+    case UPDATE_GAME: {
         return {
             ...state,
             loading: true,
         };
     }
-    case UPDATE_GAME_SUCCESS, FINISH_GAME_SUCCESS: {
+    case FINISH_GAME: {
+        return {
+            ...state,
+            loading: true,
+        };
+    }
+    case UPDATE_GAME_SUCCESS : {
         return {
             ...state,
             loading: false,
             games: {
                 ...state.games,
-                ...action.payload,
+                [action.payload.id]: {
+                    ...action.payload.game,
+                },
+            }
+        };
+    }
+    case FINISH_GAME_SUCCESS : {
+        return {
+            ...state,
+            loading: false,
+            games: {
+                ...state.games,
+                [action.payload.id]: {
+                    ...action.payload.game,
+                },
             }
         };
     }

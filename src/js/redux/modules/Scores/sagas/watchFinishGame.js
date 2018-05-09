@@ -13,8 +13,7 @@ function finishGame({ id, game }) {
 
 export function* handleFinishGame({ payload }) {
     yield call(finishGame, payload);
-    const updatedGame = { [payload.id]: payload.game };
-    yield put(scoresModule.finishGameSuccess(updatedGame));
+    yield put(scoresModule.finishGameSuccess(payload));
     toast.success('Successfully finished game');
 }
 

@@ -12,8 +12,7 @@ function createGame({ game, id }) {
 
 export function* handleCreateGame({ payload }) {
     yield call(createGame, payload);
-    const updatedGame = { [payload.id]: payload.game };
-    yield put(scoresModule.updateGameSuccess(updatedGame));
+    yield put(scoresModule.updateGameSuccess(payload));
     toast.success('Successfully updated game');
 }
 
