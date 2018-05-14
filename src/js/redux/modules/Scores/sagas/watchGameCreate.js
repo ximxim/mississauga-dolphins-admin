@@ -9,6 +9,7 @@ function createGame(game) {
     const fClient = getClient();
     const ref = fClient.database().ref('/Games');
     game.created_at = moment().format();
+    game.updated_at = moment().format();
     game.active = true;
     return ref.push(game);
 }
