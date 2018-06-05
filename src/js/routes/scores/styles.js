@@ -26,4 +26,7 @@ export default {
         fontSize: 22,
         alignSelf: 'center',
     },
+    cardBody: {
+        paddingBottom: 10,
+    },
 };

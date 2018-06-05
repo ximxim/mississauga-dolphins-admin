@@ -46,16 +46,17 @@ class scores extends Component {
     }
 
     renderEvents = () => {
-        const games = _.filter(this.props.events.items, event => event.game);
+        const upcomingEvents = this.getUpcomingEvents();
+        const games = _.filter(upcomingEvents, event => event.game);
         return <div className="row">
             {_.map(games, game => this.renderGame(game))}
         </div>
     }
 
     renderGame = (game) => {
-        return <div className="col-12">
+        return <div className="col-md-4" key={game.id}>
             <div className="card" style={styles.card}>
-                <div className="card-body">
+                <div style={styles.cardBody}>
                     <div style={styles.title}>
                         <img src={game.cover.source} alt="game cover" style={styles.image} />
                         <h5 style={styles.cardTitle}>{game.title}</h5>
@@ -68,11 +69,7 @@ class scores extends Component {
                         </tr>
                         <tr>
                             <td><FontAwesome.FaInfoCircle style={styles.icon} /></td>
-                            <td style={{ textAlign: 'left' }}>
-                                <p><b>Match No:</b> {game.match_no}</p>
-                                <p><b>Division:</b> {game.division}</p>
-                                <p><b>Round Type:</b> {game.round_type}</p>
-                            </td>
+                            <td style={{ textAlign: 'left' }}><p>{game.match_no}</p></td>
                         </tr>
                         </tbody>
                     </Table>
@@ -82,41 +79,10 @@ class scores extends Component {
         </div>;
     }
 
-    renderGamesTable = () => {
-        if (_.size(this.props.getActiveGames()) === 0) return <h6>No Active Games</h6>;
-        return <Table striped>
-            <thead>
-            <tr>
-                <th scope="col">Home</th>
-                <th scope="col">Visitor</th>
-                <th scope="col">Created At</th>
-            </tr>
-            </thead>
-            <tbody>
-            {this.renderGames()}
-            </tbody>
-        </Table>
-    }
-
-    renderGames = () => _.map(this.props.getActiveGames(), (game, index) => {
-        return <tr onClick={() => this.startUpdate(index)}>
-            <td>{game.home.name}</td>
-            <td>{game.visitor.name}</td>
-            <td>{moment(game.created_at).fromNow()}</td>
-        </tr>
-    });
-
     renderHeader = () => <div className="col text-center">
         <h2>Mississauga Dolphins Admin Portal</h2>
         <h4>Games</h4>
     </div>
-
-    renderNewGameButton = () => <Button
-        className="btn-primary text-white btn-lg circle-btn-sm padder marginBottom"
-        onClick={this.toggleNewGameModal}
-    >
-        New Game
-    </Button>
 
     renderNewGameModal = () => {
         return <Modal
@@ -132,7 +98,6 @@ class scores extends Component {
     }
 
     renderUpdateGameModal = () => {
-        console.log(_.size(this.props.getActiveGames()));
         if (_.size(this.props.getActiveGames()) === 0) return null;
         return <Modal
             isOpen={this.state.updateGameModalVisible}
@@ -164,6 +129,19 @@ class scores extends Component {
         const { gameToUpdate: id } = this.state;
         this.props.finishGame({ id, game: this.props.scores.games[id] });
         this.toggleUpdateGameModal();
+    }
+
+    getUpcomingEvents = () => {
+        const ascendingFeed = _.sortBy(this.props.events.items, ['start_time'])
+        const upcomingEvents = _.filter(ascendingFeed, (item) => item.start_time > moment().format())
+        return upcomingEvents.length > 0 ? upcomingEvents : [{ type: 'empty' }];
+    }
+
+    getPastEvents = () => {
+        const ascendingFeed = _.sortBy(this.props.events.items, ['start_time'])
+        const descendingFeed = ascendingFeed.reverse();
+        const pastEvents = _.filter(descendingFeed, (item) => item.start_time <= moment().format())
+        return pastEvents.length > 0 ? pastEvents : [{ type: 'empty' }];
     }
 
     toggleNewGameModal = () => this.setState({ newGameModalVisible: ! this.state.newGameModalVisible });
