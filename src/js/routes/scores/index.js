@@ -4,11 +4,15 @@ import { Redirect } from 'react-router-dom';
 import { Button, Modal, ModalHeader, ModalBody, Table } from 'reactstrap';
 import _ from 'lodash';
 import moment from 'moment';
+import * as FontAwesome from 'react-icons/lib/fa';
 
 import { getActiveGames } from '../../redux/selectors';
 import { createGame, updateGame, requestGames, finishGame } from '../../redux/modules/Scores';
+import { requestEvents } from '../../redux/modules/Events';
 import NewGameCard from './components/newGameCard';
 import UpdateGameCard from './components/updateGameCard';
+
+import styles from './styles';
 
 class scores extends Component {
 
@@ -20,6 +24,7 @@ class scores extends Component {
 
     componentWillMount() {
         this.props.requestGames();
+        this.props.requestEvents();
     }
 
     render() {
@@ -31,14 +36,50 @@ class scores extends Component {
                 <div className="row">
                     <div className="col text-center">
                         {this.renderHeader()}
-                        {this.renderNewGameButton()}
-                        {this.renderNewGameModal()}
-                        {this.renderGamesTable()}
+                        {this.renderEvents()}
                         {this.renderUpdateGameModal()}
+                        {this.renderNewGameModal()}
                     </div>
                 </div>
             </div>
         );
+    }
+
+    renderEvents = () => {
+        const games = _.filter(this.props.events.items, event => event.game);
+        return <div className="row">
+            {_.map(games, game => this.renderGame(game))}
+        </div>
+    }
+
+    renderGame = (game) => {
+        return <div className="col-12">
+            <div className="card" style={styles.card}>
+                <div className="card-body">
+                    <div style={styles.title}>
+                        <img src={game.cover.source} alt="game cover" style={styles.image} />
+                        <h5 style={styles.cardTitle}>{game.title}</h5>
+                    </div>
+                    <Table striped>
+                        <tbody>
+                        <tr>
+                            <td><FontAwesome.FaClockO style={styles.icon} /></td>
+                            <td style={{ textAlign: 'left' }}>{moment(game.start_time).format('MMMM Do YYYY, h:mm: a')}</td>
+                        </tr>
+                        <tr>
+                            <td><FontAwesome.FaInfoCircle style={styles.icon} /></td>
+                            <td style={{ textAlign: 'left' }}>
+                                <p><b>Match No:</b> {game.match_no}</p>
+                                <p><b>Division:</b> {game.division}</p>
+                                <p><b>Round Type:</b> {game.round_type}</p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </Table>
+                    <a href="#" className="btn btn-primary">Start Scoring</a>
+                </div>
+            </div>
+        </div>;
     }
 
     renderGamesTable = () => {
@@ -135,12 +176,14 @@ const mapStateToProps = (state) => {
     return {
         user,
         scores: state.scores,
+        events: state.events,
         getActiveGames: () => getActiveGames(state),
     };
 }
 
 const mapDispatchToProps = {
     requestGames,
+    requestEvents,
     createGame,
     updateGame,
     finishGame,
