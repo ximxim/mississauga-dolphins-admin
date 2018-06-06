@@ -203,14 +203,14 @@ class scores extends Component {
 
     getUpcomingEvents = () => {
         const ascendingFeed = _.sortBy(this.props.events.items, ['start_time'])
-        const upcomingEvents = _.filter(ascendingFeed, (item) => item.start_time > moment().format())
+        const upcomingEvents = _.filter(ascendingFeed, (item) => item.start_time >= moment(0, 'HH').format())
         return upcomingEvents.length > 0 ? upcomingEvents : [{ type: 'empty' }];
     }
 
     getPastEvents = () => {
         const ascendingFeed = _.sortBy(this.props.events.items, ['start_time'])
         const descendingFeed = ascendingFeed.reverse();
-        const pastEvents = _.filter(descendingFeed, (item) => item.start_time <= moment().format())
+        const pastEvents = _.filter(descendingFeed, (item) => item.start_time < moment(0, 'HH').format())
         return pastEvents.length > 0 ? pastEvents : [{ type: 'empty' }];
     }
 
