@@ -11,6 +11,9 @@ export const UPDATE_GAME_FAILURE = 'UPDATE_GAME_FAILURE';
 export const FINISH_GAME = 'FINISH_GAME';
 export const FINISH_GAME_SUCCESS = 'FINISH_GAME_SUCCESS';
 export const FINISH_GAME_FAILURE = 'FINISH_GAME_FAILURE';
+export const DELETE_GAME = 'DELETE_GAME';
+export const DELETE_GAME_SUCCESS = 'DELETE_GAME_SUCCESS';
+export const DELETE_GAME_FAILURE = 'DELETE_GAME_FAILURE';
 
 const initialState = {
     loading: false,
@@ -107,6 +110,15 @@ export default function reducer(state = initialState, action) {
             error: action.payload,
         };
     }
+    case DELETE_GAME_SUCCESS: {
+        return {
+            ...state,
+            games: {
+                ...state.games,
+                ...delete state.games[action.payload.id]
+            }
+        }
+    }
     default:
         return state;
     }
@@ -186,5 +198,26 @@ export function finishGameSuccess(payload) {
     return {
         type: FINISH_GAME_SUCCESS,
         payload,
+    };
+}
+
+export function deleteGame(payload) {
+    return {
+        type: DELETE_GAME,
+        payload,
+    };
+}
+
+export function deleteGameSuccess(payload) {
+    return {
+        type: DELETE_GAME_SUCCESS,
+        payload,
+    };
+}
+
+export function deleteGameFailure(error) {
+    return {
+        type: DELETE_GAME_FAILURE,
+        error,
     };
 }

@@ -6,8 +6,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import * as FontAwesome from 'react-icons/lib/fa';
 
-import { getActiveGames } from '../../redux/selectors';
-import { createGame, updateGame, requestGames, finishGame } from '../../redux/modules/Scores';
+import { getActiveGames, getScoresByGameId } from '../../redux/selectors';
+import { createGame, updateGame, requestGames, finishGame, deleteGame } from '../../redux/modules/Scores';
 import { requestEvents } from '../../redux/modules/Events';
 import NewGameCard from './components/newGameCard';
 import UpdateGameCard from './components/updateGameCard';
@@ -18,7 +18,9 @@ class scores extends Component {
 
     state = {
         newGameModalVisible: false,
+        finishedGameModalVisible: false,
         updateGameModalVisible: false,
+        selectedEvent: 0,
         gameToUpdate: null,
     }
 
@@ -37,8 +39,9 @@ class scores extends Component {
                     <div className="col text-center">
                         {this.renderHeader()}
                         {this.renderEvents()}
-                        {this.renderUpdateGameModal()}
                         {this.renderNewGameModal()}
+                        {this.renderUpdateGameModal()}
+                        {this.renderFinishedGameModal()}
                     </div>
                 </div>
             </div>
@@ -73,10 +76,46 @@ class scores extends Component {
                         </tr>
                         </tbody>
                     </Table>
-                    <a href="#" className="btn btn-primary">Start Scoring</a>
+                    <div className="padder">
+                        {this.renderScoringButtons(game)}
+                    </div>
                 </div>
             </div>
         </div>;
+    }
+
+    renderScoringButtons = (game) => {
+        const score = this.props.getScoresByGameId(game.id);
+        if (! game.game_id) {
+            return <Button
+                onClick={() =>
+                    this.setState({ selectedEvent: game.id }, this.toggleNewGameModal)
+                }
+                className="btn btn-primary btn-block"
+            >
+                Start Scoring
+            </Button>
+        }
+
+        if (game.game_id && ! score.active) {
+            return <Button
+                onClick={() =>
+                    this.setState({ selectedEvent: game.id }, this.toggleFinishedGameModal)
+                }
+                className="btn btn-primary btn-block"
+            >
+                Review Score
+            </Button>
+        }
+
+        return <Button
+            onClick={() =>
+                this.setState({ selectedEvent: game.id }, this.toggleUpdateGameModal)
+            }
+            className="btn btn-primary btn-block"
+        >
+            Update Score
+        </Button>
     }
 
     renderHeader = () => <div className="col text-center">
@@ -90,15 +129,39 @@ class scores extends Component {
             toggle={this.toggleNewGameModal}
             className={this.props.className}
         >
-            <ModalHeader toggle={this.toggleNewGameModal}>Create Game</ModalHeader>
+            <ModalHeader toggle={this.toggleNewGameModal}>Start Scoring</ModalHeader>
             <ModalBody>
-                <NewGameCard submit={this.handleSubmit} />
+                <NewGameCard eventId={this.state.selectedEvent} submit={this.handleSubmit} />
+            </ModalBody>
+        </Modal>;
+    }
+
+    renderFinishedGameModal = () => {
+        const { selectedEvent } = this.state;
+        const selectedGame = (selectedEvent) ? this.props.getScoresByGameId(selectedEvent) : null;
+
+        return <Modal
+            isOpen={this.state.finishedGameModalVisible}
+            toggle={this.toggleFinishedGameModal}
+            className={this.props.className}
+        >
+            <ModalHeader toggle={this.toggleFinishedGameModal}>Review Score</ModalHeader>
+            <ModalBody>
+                <UpdateGameCard
+                    update={this.handleUpdate}
+                    delete={this.handleDelete}
+                    game={selectedGame}
+                />
             </ModalBody>
         </Modal>;
     }
 
     renderUpdateGameModal = () => {
         if (_.size(this.props.getActiveGames()) === 0) return null;
+
+        const { selectedEvent } = this.state;
+        const selectedGame = (selectedEvent) ? this.props.getScoresByGameId(selectedEvent) : null;
+
         return <Modal
             isOpen={this.state.updateGameModalVisible}
             toggle={this.toggleUpdateGameModal}
@@ -109,7 +172,7 @@ class scores extends Component {
                 <UpdateGameCard
                     update={this.handleUpdate}
                     finish={this.handleFinish}
-                    game={this.props.scores.games[this.state.gameToUpdate]}
+                    game={selectedGame}
                 />
             </ModalBody>
         </Modal>;
@@ -121,14 +184,21 @@ class scores extends Component {
     }
 
     handleUpdate = (form) => {
+        const selectedGame = this.props.getScoresByGameId(this.state.selectedEvent);
         this.toggleUpdateGameModal();
-        this.props.updateGame({ id: this.state.gameToUpdate, game: form });
+        this.props.updateGame({ id: selectedGame.id, game: form });
     }
 
     handleFinish = () => {
-        const { gameToUpdate: id } = this.state;
-        this.props.finishGame({ id, game: this.props.scores.games[id] });
+        const selectedGame = this.props.getScoresByGameId(this.state.selectedEvent);
+        this.props.finishGame({ id: selectedGame.id, game: selectedGame });
         this.toggleUpdateGameModal();
+    }
+
+    handleDelete = () => {
+        const selectedGame = this.props.getScoresByGameId(this.state.selectedEvent);
+        this.props.deleteGame({ id: selectedGame.id, game: selectedGame });
+        this.toggleFinishedGameModal();
     }
 
     getUpcomingEvents = () => {
@@ -146,6 +216,7 @@ class scores extends Component {
 
     toggleNewGameModal = () => this.setState({ newGameModalVisible: ! this.state.newGameModalVisible });
     toggleUpdateGameModal = () => this.setState({ updateGameModalVisible: ! this.state.updateGameModalVisible });
+    toggleFinishedGameModal = () => this.setState({ finishedGameModalVisible: ! this.state.finishedGameModalVisible });
     startUpdate = game => this.setState({ gameToUpdate: game }, this.toggleUpdateGameModal);
 }
 
@@ -156,6 +227,7 @@ const mapStateToProps = (state) => {
         scores: state.scores,
         events: state.events,
         getActiveGames: () => getActiveGames(state),
+        getScoresByGameId: (id) => getScoresByGameId(state, id),
     };
 }
 
@@ -165,6 +237,7 @@ const mapDispatchToProps = {
     createGame,
     updateGame,
     finishGame,
+    deleteGame,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(scores);

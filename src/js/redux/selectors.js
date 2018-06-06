@@ -7,3 +7,9 @@ export const getActiveGames = state => {
     });
     return obj;
 }
+
+export const getScoresByGameId = (state, id) => {
+    const game = _.find(state.scores.games, { event_id: id });
+    const event = state.events.items[id];
+    if (event && game) return { ...game, id: event.game_id }
+};

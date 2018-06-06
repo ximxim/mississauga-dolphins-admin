@@ -68,23 +68,36 @@ class UpdateGameCard extends Component {
                             </tbody>
                         </Table>
                         <Button
-                            className="btn-primary text-white btn-lg circle-btn-sm marginBottom"
+                            className="btn-primary text-white btn-lg circle-btn-sm marginBottom btn-block"
                             variant="raised"
                             onClick={this.handleUpdateGame}
                         >
                             Update Game
                         </Button>
-                        <Button
-                            className="btn-danger text-white btn-lg circle-btn-sm marginBottom"
-                            variant="raised"
-                            onClick={this.props.finish}
-                        >
-                            Finish Game
-                        </Button>
+                        {this.renderSecondaryAction()}
                     </Form>
                 </div>
             </div>
         );
+    }
+
+    renderSecondaryAction = () => {
+        if (this.props.finish) {
+            return <Button
+                className="btn-danger text-white btn-lg circle-btn-sm marginBottom btn-block"
+                variant="raised"
+                onClick={this.props.finish}
+            >
+                Finish Game
+            </Button>
+        }
+        return <Button
+            className="btn-danger text-white btn-lg circle-btn-sm marginBottom btn-block"
+            variant="raised"
+            onClick={this.props.delete}
+        >
+            Delete Game
+        </Button>
     }
 
     renderHomeTeamNameField = () => {

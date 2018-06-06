@@ -7,16 +7,16 @@ class NewGameCard extends Component {
     state = {
         home: {
             name: ENV.newGame.home.name || '',
-            score: ENV.newGame.home.score || '',
-            wickets: ENV.newGame.home.wickets || '',
-            overs: ENV.newGame.home.overs || '',
+            score: ENV.newGame.home.score || '0',
+            wickets: ENV.newGame.home.wickets || '0',
+            overs: ENV.newGame.home.overs || '0',
             batting: ENV.newGame.home.batting || true,
         },
         visitor: {
             name: ENV.newGame.visitor.name || '',
-            score: ENV.newGame.visitor.score || '',
-            wickets: ENV.newGame.visitor.wickets || '',
-            overs: ENV.newGame.visitor.overs || '',
+            score: ENV.newGame.visitor.score || '0',
+            wickets: ENV.newGame.visitor.wickets || '0',
+            overs: ENV.newGame.visitor.overs || '0',
             batting: ENV.newGame.visitor.batting || false,
         },
     }
@@ -63,7 +63,7 @@ class NewGameCard extends Component {
                             </tbody>
                         </Table>
                         <Button
-                            className="btn-primary text-white btn-lg circle-btn-sm"
+                            className="btn-primary text-white btn-lg circle-btn-sm btn-block"
                             variant="raised"
                             onClick={this.handleCreateGame}
                         >
@@ -270,7 +270,8 @@ class NewGameCard extends Component {
 
         if (home.name && home.wickets && home.overs && home.score
             && visitor.name && visitor.wickets && visitor.overs && visitor.score) {
-            this.props.submit(this.state);
+            const formData = { ...this.state, event_id: this.props.eventId }
+            this.props.submit(formData);
         } else {
             console.log('something missing');
             console.log(this.state);

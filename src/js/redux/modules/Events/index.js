@@ -1,3 +1,5 @@
+import { CREATE_GAME_SUCCESS, DELETE_GAME_SUCCESS } from '../Scores';
+
 //ACTION
 export const REQUEST_EVENTS = 'REQUEST_EVENTS';
 export const REQUEST_EVENTS_SUCCESS = 'REQUEST_EVENTS_SUCCESS';
@@ -30,6 +32,32 @@ export default function reducer(state = initialState, action) {
             ...state,
             loading: false,
             error: action.payload,
+        }
+    }
+    case CREATE_GAME_SUCCESS: {
+        const gameId = Object.keys(action.payload)[0];
+        const eventId = action.payload[gameId].event_id;
+        return {
+            ...state,
+            items: {
+                ...state.items,
+                [eventId]: {
+                    ...state.items[eventId],
+                    game_id: gameId,
+                }
+            }
+        }
+    }
+    case DELETE_GAME_SUCCESS: {
+        return {
+            ...state,
+            items: {
+                ...state.items,
+                [action.payload.game.event_id]: {
+                    ...state.items[action.payload.game.event_id],
+                    game_id: null,
+                }
+            }
         }
     }
     default:

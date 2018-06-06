@@ -14,9 +14,16 @@ function createGame(game) {
     return ref.push(game);
 }
 
+function updateEvent(eventId, gameId) {
+    const fClient = getClient();
+    const ref = fClient.database().ref(`/Events/${eventId}`);
+    return ref.update({game_id: gameId});
+}
+
 export function* handleCreateGame({ payload }) {
     const response = yield call(createGame, payload);
     if (response) {
+        yield call(updateEvent, payload.event_id, response.key);
         const newGame = { [response.key]: payload };
         yield put(scoresModule.createGameSuccess(newGame));
         toast.success('Successfully created game');
