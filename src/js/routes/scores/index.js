@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { Button, Modal, ModalHeader, ModalBody, Table } from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalBody, Table, Collapse } from 'reactstrap';
 import _ from 'lodash';
 import moment from 'moment';
 import * as FontAwesome from 'react-icons/lib/fa';
@@ -20,6 +20,8 @@ class scores extends Component {
         newGameModalVisible: false,
         finishedGameModalVisible: false,
         updateGameModalVisible: false,
+        otherUpcomingGamesVisible: false,
+        otherPastGamesVisible: false,
         selectedEvent: 0,
         gameToUpdate: null,
     }
@@ -36,9 +38,11 @@ class scores extends Component {
         return (
             <div className="container">
                 <div className="row">
-                    <div className="col text-center">
+                    <div className="col text-center marginBottomx50">
                         {this.renderHeader()}
-                        {this.renderEvents()}
+                        {this.renderActiveGames()}
+                        {this.renderUpcomingEvents()}
+                        {this.renderPastEvents()}
                         {this.renderNewGameModal()}
                         {this.renderUpdateGameModal()}
                         {this.renderFinishedGameModal()}
@@ -48,11 +52,69 @@ class scores extends Component {
         );
     }
 
-    renderEvents = () => {
+    renderUpcomingEvents = () => {
         const upcomingEvents = this.getUpcomingEvents();
         const games = _.filter(upcomingEvents, event => event.game);
-        return <div className="row">
-            {_.map(games, game => this.renderGame(game))}
+        const firstThreeGames = games.slice(0, 3);
+        const otherGames = games.slice(3, games.length);
+        const { otherUpcomingGamesVisible } = this.state;
+
+        return <div>
+            <h4 className="helper">Upcoming Games</h4>
+            <div className="row">
+                {_.map(firstThreeGames, game => this.renderGame(game))}
+                <Button
+                    className="btn btn-info center"
+                    onClick={this.toggleOtherUpcomingGamesCollapse}
+                >
+                    {otherUpcomingGamesVisible ? 'Hide Games' : 'Show All Upcoming Games'}
+                </Button>
+                <Collapse isOpen={otherUpcomingGamesVisible}>
+                    <div className="row">
+                        {_.map(otherGames, game => this.renderGame(game))}
+                    </div>
+                </Collapse>
+            </div>
+        </div>
+    }
+
+    renderPastEvents = () => {
+        const pastEvents = this.getPastEvents();
+        const games = _.filter(pastEvents, event => event.game);
+        const firstThreeGames = games.slice(0, 3);
+        const otherGames = games.slice(3, games.length);
+        const { otherPastGamesVisible } = this.state
+
+        return <div>
+            <h4 className="helper">Past Games</h4>
+            <div className="row">
+                {_.map(firstThreeGames, game => this.renderGame(game))}
+                <Button
+                    className="btn btn-info center"
+                    onClick={this.toggleOtherPastGamesCollapse}
+                >
+                    {otherPastGamesVisible ? 'Hide Games' : 'Show All Past Games'}
+                </Button>
+                <Collapse isOpen={otherPastGamesVisible}>
+                    <div className="row">
+                        {_.map(otherGames, game => this.renderGame(game))}
+                    </div>
+                </Collapse>
+            </div>
+        </div>
+    }
+
+    renderActiveGames = () => {
+        const activeGames = this.getActiveGameEvents();
+        const games = _.filter(activeGames, event => event.game);
+
+        if (games.length === 0) return null;
+
+        return <div>
+            <h4 className="helper">Active Games</h4>
+            <div className="row">
+                {_.map(games, game => this.renderGame(game))}
+            </div>
         </div>
     }
 
@@ -207,6 +269,11 @@ class scores extends Component {
         return upcomingEvents.length > 0 ? upcomingEvents : [{ type: 'empty' }];
     }
 
+    getActiveGameEvents = () => {
+        const activeGames = _.filter(this.props.scores.games, game => game.active);
+        return _.map(activeGames, game => this.props.events.items[game.event_id]);
+    }
+
     getPastEvents = () => {
         const ascendingFeed = _.sortBy(this.props.events.items, ['start_time'])
         const descendingFeed = ascendingFeed.reverse();
@@ -217,6 +284,8 @@ class scores extends Component {
     toggleNewGameModal = () => this.setState({ newGameModalVisible: ! this.state.newGameModalVisible });
     toggleUpdateGameModal = () => this.setState({ updateGameModalVisible: ! this.state.updateGameModalVisible });
     toggleFinishedGameModal = () => this.setState({ finishedGameModalVisible: ! this.state.finishedGameModalVisible });
+    toggleOtherUpcomingGamesCollapse = () => this.setState({ otherUpcomingGamesVisible: ! this.state.otherUpcomingGamesVisible });
+    toggleOtherPastGamesCollapse = () => this.setState({ otherPastGamesVisible: ! this.state.otherPastGamesVisible });
     startUpdate = game => this.setState({ gameToUpdate: game }, this.toggleUpdateGameModal);
 }
 

@@ -12,6 +12,25 @@ body {
     margin-bottom: 10px;
 }
 
+.marginBottomx50 {
+    margin-bottom: 50px;
+}
+
 .hidden {
     display: none;
+}
+
+h4.helper {
+    padding-top: 20px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 20px;
+    color: #484848;
+    border-bottom: 1px solid grey;
+}
+
+.btn.center {
+    justify-content: center;
+    align-items: center;
+    margin: auto;
 }
