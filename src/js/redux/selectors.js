@@ -13,3 +13,5 @@ export const getScoresByGameId = (state, id) => {
     const event = state.events.items[id];
     if (event && game) return { ...game, id: event.game_id }
 };
+
+export const getEventById = (state, id) => (state.events.items) ? state.events.items[id] : null;

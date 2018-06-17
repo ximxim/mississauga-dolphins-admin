@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Redirect, Route, BrowserRouter } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
 import withSetup from './js/redux/setup';
 
 import signin from './js/routes/signin';
-import scores from './js/routes/scores';
+import games from './js/routes/games';
+import game from './js/routes/game';
 
 class App extends Component {
 
@@ -17,7 +18,8 @@ class App extends Component {
             <div>
                 <React.Fragment>
                     <Route path="/signin" component={signin} />
-                    <Route path="/scores" component={scores} />
+                    <Route path="/games" component={games} />
+                    <Route path="/game/:id" component={game} />
                 </React.Fragment>
                 <ToastContainer />
             </div>

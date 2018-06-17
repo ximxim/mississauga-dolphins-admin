@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
 import { Form, FormGroup, Input, Button } from 'reactstrap';
 
 import { requestLogin } from '../../redux/modules/AuthUser';
 
 import ENV from '../../../env';
 
-class signin extends Component {
+class SignIn extends Component {
 
     state = {
         username: ENV.login.username || '',
@@ -15,12 +14,6 @@ class signin extends Component {
     }
 
     render() {
-        if (this.props.location.pathname === '/') {
-            if (this.props.user) {
-                return (<Redirect to={'/scores'} />);
-            }
-        }
-
         const { username, password } = this.state;
 
         return (
@@ -81,4 +74,4 @@ const mapStateToProps = ({ authUser }) => {
 
 const mapDispatchToProps = { requestLogin };
 
-export default connect(mapStateToProps, mapDispatchToProps)(signin);
+export default connect(mapStateToProps, mapDispatchToProps)(SignIn);
