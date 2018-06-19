@@ -1,4 +1,5 @@
 import { call, takeEvery, put } from 'redux-saga/effects';
+import { toast } from 'react-toastify';
 
 import { getClient } from '../../../../utils/firebase';
 import * as eventsModule from '../index';
@@ -13,7 +14,12 @@ function getGames() {
 
 export function* handleRequest() {
     const response = yield call(getGames);
-    yield put(eventsModule.requestEventsSuccess(response));
+    if (response.code) {
+        yield put(eventsModule.requestEventsFailure(response));
+        toast.error(`EVENTS DATA: ${response.code}`);
+    } else {
+        yield put(eventsModule.requestEventsSuccess(response));
+    }
 }
 
 export default function* watchRequest() {

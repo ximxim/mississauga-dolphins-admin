@@ -31,7 +31,7 @@ export default function reducer(state = initialState, action) {
         return {
             ...state,
             loading: false,
-            error: action.payload,
+            error: action.error,
         }
     }
     case CREATE_GAME_SUCCESS: {

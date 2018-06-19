@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Button, Modal, ModalHeader, ModalBody, Table, Collapse } from 'reactstrap';
+import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import moment from 'moment';
 import * as FontAwesome from 'react-icons/lib/fa';
@@ -155,14 +156,11 @@ class games extends Component {
                     </Table>
                     <div className="padder">
                         {this.renderScoringButtons(game)}
-                        <Button
-                            onClick={() =>
-                                this.setState({ selectedEvent: game.id }, this.toggleNewGameModal)
-                            }
-                            className="btn btn-primary btn-block"
-                        >
+                        <Link
+                            to={`/game/${game.id}`}
+                            className="btn btn-primary btn-block">
                             See Details
-                        </Button>
+                        </Link>
                     </div>
                 </div>
             </div>

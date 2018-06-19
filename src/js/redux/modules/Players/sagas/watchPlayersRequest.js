@@ -2,26 +2,27 @@ import { call, takeEvery, put } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 
 import { getClient } from '../../../../utils/firebase';
-import * as scoresModule from '../index';
+import * as playersModule from '../index';
 
-function getGames() {
+function getPlayers() {
     const fClient = getClient();
-    const ref = fClient.database().ref('/Games');
+    const ref = fClient.database().ref('/Players');
     return new Promise(resolve =>
         ref.once('value', snapshot =>
             resolve(snapshot.val()), error => resolve(error)));
 }
 
 export function* handleRequest() {
-    const response = yield call(getGames);
+    const response = yield call(getPlayers);
     if (response.code) {
-        yield put(scoresModule.requestGamesFailure(response));
-        toast.error(`SCORES DATA: ${response.code}`);
+        yield put(playersModule.requestPlayersFailure(response));
+        toast.error(`PLAYERS DATA: ${response.code}`);
     } else {
-        yield put(scoresModule.requestGamesSuccess(response));
+        yield put(playersModule.requestPlayersSuccess(response));
     }
+
 }
 
 export default function* watchRequest() {
-    yield takeEvery(scoresModule.REQUEST_GAMES, handleRequest);
+    yield takeEvery(playersModule.REQUEST_PLAYERS, handleRequest);
 }
