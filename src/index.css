@@ -16,6 +16,10 @@ body {
     margin-bottom: 50px;
 }
 
+.marginTopx50 {
+    margin-top: 50px;
+}
+
 .hidden {
     display: none;
 }

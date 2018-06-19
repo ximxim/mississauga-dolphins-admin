@@ -158,7 +158,7 @@ class games extends Component {
                         {this.renderScoringButtons(game)}
                         <Link
                             to={`/game/${game.id}`}
-                            className="btn btn-primary btn-block">
+                            className="btn btn-secondary btn-block">
                             See Details
                         </Link>
                     </div>
