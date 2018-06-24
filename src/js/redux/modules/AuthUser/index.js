@@ -2,6 +2,7 @@
 export const REQUEST_LOGIN = 'REQUEST_LOGIN';
 export const REQUEST_LOGIN_SUCCESS = 'REQUEST_LOGIN_SUCCESS';
 export const REQUEST_LOGIN_FAILURE = 'REQUEST_LOGIN_FAILURE';
+export const REQUEST_SIGNOUT = 'REQUEST_SIGNOUT';
 
 const initialState = {
     uid: null,
@@ -36,6 +37,9 @@ export default function reducer(state = initialState, action) {
             loading: false,
         }
     }
+    case REQUEST_SIGNOUT: {
+        return initialState;
+    }
     default:
         return state;
     }
@@ -60,5 +64,11 @@ export function requestLoginFailure(payload) {
     return {
         type: REQUEST_LOGIN_FAILURE,
         payload,
+    };
+}
+
+export function requestSignOut() {
+    return {
+        type: REQUEST_SIGNOUT,
     };
 }
