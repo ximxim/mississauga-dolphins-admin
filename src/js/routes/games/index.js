@@ -25,9 +25,6 @@ class games extends Component {
                         {this.renderActiveGames()}
                         {this.renderUpcomingGames()}
                         {this.renderPastGames()}
-                        {this.renderNewGameModal()}
-                        {this.renderUpdateGameModal()}
-                        {this.renderFinishedGameModal()}
                     </div>
                 </div>
             </div>
