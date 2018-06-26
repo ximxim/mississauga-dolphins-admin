@@ -1,29 +1,19 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button, Modal, ModalHeader, ModalBody, Table, Collapse } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Button, Table, Collapse } from 'reactstrap';
 import _ from 'lodash';
 import moment from 'moment';
-import * as FontAwesome from 'react-icons/lib/fa';
 
 import requiresAuth from '../../utils/requiresAuth';
 import { getActiveGames, getScoresByGameId } from '../../redux/selectors';
 import { createGame, updateGame, finishGame, deleteGame } from '../../redux/modules/Scores';
-import NewGameCard from './components/newGameCard';
-import UpdateGameCard from './components/updateGameCard';
-
-import styles from './styles';
 
 class games extends Component {
 
     state = {
-        newGameModalVisible: false,
-        finishedGameModalVisible: false,
-        updateGameModalVisible: false,
         otherUpcomingGamesVisible: false,
         otherPastGamesVisible: false,
-        selectedEvent: 0,
-        gameToUpdate: null,
+        otherActiveGamesVisible: false,
     }
 
     render() {
@@ -44,245 +34,106 @@ class games extends Component {
         );
     }
 
+    renderActiveGames = () => {
+        const activeGames = this.getActiveGameEvents();
+        const games = _.filter(activeGames, event => event.game);
+        const { otherActiveGamesVisible } = this.state;
+
+        return this.renderGames({
+            games,
+            collapse: otherActiveGamesVisible,
+            title: 'Active Games',
+            toggle: this.toggleOtherActiveGamesCollapse,
+        });
+    }
+
     renderUpcomingGames = () => {
         const upcomingEvents = this.getUpcomingEvents();
         const games = _.filter(upcomingEvents, event => event.game);
+        const { otherUpcomingGamesVisible } = this.state;
 
-        if (games.length === 0) {
-            return null
-        } else if (games.length < 3) {
-            return <div>
-                <h4 className="helper">Upcoming Games</h4>
-                <div className="row">
-                    {_.map(games, game => this.renderGame(game))}
-                </div>
-            </div>
-        } else {
-            const firstThreeGames = games.slice(0, 3);
-            const otherGames = games.slice(3, games.length);
-            const { otherUpcomingGamesVisible } = this.state;
-
-            return <div>
-                <h4 className="helper">Upcoming Games</h4>
-                <div className="row">
-                    {_.map(firstThreeGames, game => this.renderGame(game))}
-                    <Button
-                        className="btn btn-info center"
-                        onClick={this.toggleOtherUpcomingGamesCollapse}
-                    >
-                        {otherUpcomingGamesVisible ? 'Hide Games' : 'Show All Upcoming Games'}
-                    </Button>
-                    <Collapse isOpen={otherUpcomingGamesVisible}>
-                        <div className="row">
-                            {_.map(otherGames, game => this.renderGame(game))}
-                        </div>
-                    </Collapse>
-                </div>
-            </div>
-        }
+        return this.renderGames({
+            games,
+            collapse: otherUpcomingGamesVisible,
+            title: 'Upcoming Games',
+            toggle: this.toggleOtherUpcomingGamesCollapse,
+        });
     }
 
     renderPastGames = () => {
         const pastEvents = this.getPastEvents();
         const games = _.filter(pastEvents, event => event.game);
+        const { otherPastGamesVisible } = this.state;
 
+        return this.renderGames({
+            games,
+            collapse: otherPastGamesVisible,
+            title: 'Past Games',
+            toggle: this.toggleOtherPastGamesCollapse,
+        });
+    }
+
+    renderGames = ({ games, collapse, title, toggle }) => {
+        let body;
         if (games.length === 0) {
             return null
         } else if (games.length < 3) {
-            return <div>
-                <h4 className="helper">Upcoming Games</h4>
-                <div className="row">
-                    {_.map(games, game => this.renderGame(game))}
-                </div>
-            </div>
+            body = <tbody>
+            {_.map(games, game => this.renderGame(game))}
+            </tbody>
         } else {
             const firstThreeGames = games.slice(0, 3);
             const otherGames = games.slice(3, games.length);
-            const { otherPastGamesVisible } = this.state
 
-            return <div>
-                <h4 className="helper">Past Games</h4>
-                <div className="row">
-                    {_.map(firstThreeGames, game => this.renderGame(game))}
+            body = <tbody>
+            {_.map(firstThreeGames, game => this.renderGame(game))}
+            <tr>
+                <td colSpan="2">
                     <Button
                         className="btn btn-info center"
-                        onClick={this.toggleOtherPastGamesCollapse}
+                        onClick={toggle}
                     >
-                        {otherPastGamesVisible ? 'Hide Games' : 'Show All Past Games'}
+                        {collapse ? 'Hide Games' : `Show All ${title}`}
                     </Button>
-                    <Collapse isOpen={otherPastGamesVisible}>
-                        <div className="row">
+                </td>
+            </tr>
+            <tr>
+                <td colSpan="2" style={{ borderTop: 0, padding: 0 }}>
+                    <Collapse isOpen={collapse}>
+                        <Table>
+                            <tbody>
                             {_.map(otherGames, game => this.renderGame(game))}
-                        </div>
+                            </tbody>
+                        </Table>
                     </Collapse>
-                </div>
-            </div>
+                </td>
+            </tr>
+            </tbody>;
         }
-    }
-
-    renderActiveGames = () => {
-        const activeGames = this.getActiveGameEvents();
-        const games = _.filter(activeGames, event => event.game);
-
-        if (games.length === 0) return null;
 
         return <div>
-            <h4 className="helper">Active Games</h4>
-            <div className="row">
-                {_.map(games, game => this.renderGame(game))}
-            </div>
+            <h4 className="helper">{title}</h4>
+            <Table bordered>
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Start Date</th>
+                </tr>
+                </thead>
+                {body}
+            </Table>
         </div>
     }
 
-    renderGame = (game) => {
-        return <div className="col-md-4" key={game.id}>
-            <div className="card" style={styles.card}>
-                <div style={styles.cardBody}>
-                    <div style={styles.title}>
-                        <img src={game.cover.source} alt="game cover" style={styles.image} />
-                        <h5 style={styles.cardTitle}>{game.title}</h5>
-                    </div>
-                    <Table striped>
-                        <tbody>
-                        <tr>
-                            <td><FontAwesome.FaClockO style={styles.icon} /></td>
-                            <td style={{ textAlign: 'left' }}>{moment(game.start_time).format('MMMM Do YYYY, h:mm: a')}</td>
-                        </tr>
-                        <tr>
-                            <td><FontAwesome.FaInfoCircle style={styles.icon} /></td>
-                            <td style={{ textAlign: 'left' }}><p>{game.match_no}</p></td>
-                        </tr>
-                        </tbody>
-                    </Table>
-                    <div className="padder">
-                        {this.renderScoringButtons(game)}
-                        <Link
-                            to={`/game/${game.id}`}
-                            className="btn btn-secondary btn-block">
-                            See Details
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>;
-    }
-
-    renderScoringButtons = (game) => {
-        const score = this.props.getScoresByGameId(game.id);
-        if (! game.game_id) {
-            return <Button
-                onClick={() =>
-                    this.setState({ selectedEvent: game.id }, this.toggleNewGameModal)
-                }
-                className="btn btn-primary btn-block"
-            >
-                Start Scoring
-            </Button>
-        }
-
-        if (game.game_id && ! score.active) {
-            return <Button
-                onClick={() =>
-                    this.setState({ selectedEvent: game.id }, this.toggleFinishedGameModal)
-                }
-                className="btn btn-primary btn-block"
-            >
-                Review Score
-            </Button>
-        }
-
-        return <Button
-            onClick={() =>
-                this.setState({ selectedEvent: game.id }, this.toggleUpdateGameModal)
-            }
-            className="btn btn-primary btn-block"
-        >
-            Update Score
-        </Button>
-    }
+    renderGame = (game) => <tr key={game.id} onClick={() => this.props.history.push(`/Game/${game.id}`)}>
+        <td>{game.title}</td>
+        <td>{moment(game.start_time).format('MMMM Do YYYY, h:mm: a')}</td>
+    </tr>
 
     renderHeader = () => <div className="col text-center">
         <h2>Mississauga Dolphins Admin Portal</h2>
         <h4>Games</h4>
     </div>
-
-    renderNewGameModal = () => {
-        return <Modal
-            isOpen={this.state.newGameModalVisible}
-            toggle={this.toggleNewGameModal}
-            className={this.props.className}
-        >
-            <ModalHeader toggle={this.toggleNewGameModal}>Start Scoring</ModalHeader>
-            <ModalBody>
-                <NewGameCard eventId={this.state.selectedEvent} submit={this.handleSubmit} />
-            </ModalBody>
-        </Modal>;
-    }
-
-    renderFinishedGameModal = () => {
-        const { selectedEvent } = this.state;
-        const selectedGame = (selectedEvent) ? this.props.getScoresByGameId(selectedEvent) : null;
-
-        return <Modal
-            isOpen={this.state.finishedGameModalVisible}
-            toggle={this.toggleFinishedGameModal}
-            className={this.props.className}
-        >
-            <ModalHeader toggle={this.toggleFinishedGameModal}>Review Score</ModalHeader>
-            <ModalBody>
-                <UpdateGameCard
-                    update={this.handleUpdate}
-                    delete={this.handleDelete}
-                    game={selectedGame}
-                />
-            </ModalBody>
-        </Modal>;
-    }
-
-    renderUpdateGameModal = () => {
-        if (! this.props.scores || _.size(this.props.getActiveGames()) === 0) return null;
-
-        const { selectedEvent } = this.state;
-        const selectedGame = (selectedEvent) ? this.props.getScoresByGameId(selectedEvent) : null;
-
-        return <Modal
-            isOpen={this.state.updateGameModalVisible}
-            toggle={this.toggleUpdateGameModal}
-            className={this.props.className}
-        >
-            <ModalHeader toggle={this.toggleUpdateGameModal}>Update Game</ModalHeader>
-            <ModalBody>
-                <UpdateGameCard
-                    update={this.handleUpdate}
-                    finish={this.handleFinish}
-                    game={selectedGame}
-                />
-            </ModalBody>
-        </Modal>;
-    }
-
-    handleSubmit = (form) => {
-        this.toggleNewGameModal();
-        this.props.createGame(form);
-    }
-
-    handleUpdate = (form) => {
-        const selectedGame = this.props.getScoresByGameId(this.state.selectedEvent);
-        this.toggleUpdateGameModal();
-        this.props.updateGame({ id: selectedGame.id, game: form });
-    }
-
-    handleFinish = () => {
-        const selectedGame = this.props.getScoresByGameId(this.state.selectedEvent);
-        this.props.finishGame({ id: selectedGame.id, game: selectedGame });
-        this.toggleUpdateGameModal();
-    }
-
-    handleDelete = () => {
-        const selectedGame = this.props.getScoresByGameId(this.state.selectedEvent);
-        this.props.deleteGame({ id: selectedGame.id, game: selectedGame });
-        this.toggleFinishedGameModal();
-    }
 
     getUpcomingEvents = () => {
         if (this.props.events) {
@@ -314,12 +165,9 @@ class games extends Component {
         }
     }
 
-    toggleNewGameModal = () => this.setState({ newGameModalVisible: ! this.state.newGameModalVisible });
-    toggleUpdateGameModal = () => this.setState({ updateGameModalVisible: ! this.state.updateGameModalVisible });
-    toggleFinishedGameModal = () => this.setState({ finishedGameModalVisible: ! this.state.finishedGameModalVisible });
+    toggleOtherActiveGamesCollapse = () => this.setState({ otherActiveGamesVisible: ! this.state.otherActiveGamesVisible });
     toggleOtherUpcomingGamesCollapse = () => this.setState({ otherUpcomingGamesVisible: ! this.state.otherUpcomingGamesVisible });
     toggleOtherPastGamesCollapse = () => this.setState({ otherPastGamesVisible: ! this.state.otherPastGamesVisible });
-    startUpdate = game => this.setState({ gameToUpdate: game }, this.toggleUpdateGameModal);
 }
 
 const mapStateToProps = state => {

@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
 import { Form, FormGroup, Input, Button, Table, Label } from 'reactstrap';
+import { toast } from 'react-toastify';
 
 import ENV from '../../../../env';
 
-class NewGameCard extends Component {
+class UpdateGameCard extends Component {
     state = {
         home: {
-            name: ENV.newGame.home.name || '',
-            score: ENV.newGame.home.score || '0',
-            wickets: ENV.newGame.home.wickets || '0',
-            overs: ENV.newGame.home.overs || '0',
-            batting: ENV.newGame.home.batting || true,
+            name: '',
+            score: '',
+            wickets: '',
+            overs: '',
+            batting: false,
         },
         visitor: {
-            name: ENV.newGame.visitor.name || '',
-            score: ENV.newGame.visitor.score || '0',
-            wickets: ENV.newGame.visitor.wickets || '0',
-            overs: ENV.newGame.visitor.overs || '0',
-            batting: ENV.newGame.visitor.batting || false,
+            name: '',
+            score: '',
+            wickets: '',
+            overs: '',
+            batting: false,
         },
+    }
+
+    componentDidMount() {
+        this.setState(this.props.game);
     }
 
     render() {
@@ -63,16 +68,36 @@ class NewGameCard extends Component {
                             </tbody>
                         </Table>
                         <Button
-                            className="btn-primary text-white btn-lg circle-btn-sm btn-block"
+                            className="btn-primary text-white btn-lg circle-btn-sm marginBottom btn-block"
                             variant="raised"
-                            onClick={this.handleCreateGame}
+                            onClick={this.handleUpdateGame}
                         >
-                            Create Game
+                            Update Game
                         </Button>
+                        {this.renderSecondaryAction()}
                     </Form>
                 </div>
             </div>
         );
+    }
+
+    renderSecondaryAction = () => {
+        if (this.props.finish) {
+            return <Button
+                className="btn-danger text-white btn-lg circle-btn-sm marginBottom btn-block"
+                variant="raised"
+                onClick={() => this.props.finish(this.props.eventId)}
+            >
+                Finish Game
+            </Button>
+        }
+        return <Button
+            className="btn-danger text-white btn-lg circle-btn-sm marginBottom btn-block"
+            variant="raised"
+            onClick={() => this.props.delete(this.props.eventId)}
+        >
+            Delete Game
+        </Button>
     }
 
     renderHomeTeamNameField = () => {
@@ -265,18 +290,17 @@ class NewGameCard extends Component {
         </FormGroup>;
     }
 
-    handleCreateGame = () => {
+    handleUpdateGame = () => {
         const { home, visitor } = this.state;
 
         if (home.name && home.wickets && home.overs && home.score
             && visitor.name && visitor.wickets && visitor.overs && visitor.score) {
-            const formData = { ...this.state, event_id: this.props.eventId }
-            this.props.submit(formData);
+            this.props.update(this.state, this.props.eventId);
         } else {
-            console.log('something missing');
+            toast.error('Make sure all the fields are filled in');
             console.log(this.state);
         }
     }
 }
 
-export default NewGameCard;
+export default UpdateGameCard;

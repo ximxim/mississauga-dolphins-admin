@@ -48,6 +48,7 @@ class SignIn extends Component {
                                     className="btn-success text-white btn-lg circle-btn-sm btn-block"
                                     variant="raised"
                                     onClick={this.onUserLogin}
+                                    disabled={this.props.loading}
                                 >
                                     Sign In
                                 </Button>
@@ -68,8 +69,8 @@ class SignIn extends Component {
 }
 
 const mapStateToProps = ({ authUser }) => {
-    const { uid: user } = authUser;
-    return { user };
+    const { uid: user, loading } = authUser;
+    return { user, loading };
 }
 
 const mapDispatchToProps = { requestLogin };
