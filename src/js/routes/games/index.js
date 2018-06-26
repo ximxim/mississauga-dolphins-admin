@@ -17,7 +17,6 @@ class games extends Component {
     }
 
     render() {
-      console.log('test');
         return (
             <div className="container">
                 <div className="row">
