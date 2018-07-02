@@ -14,7 +14,6 @@ import {
     deleteGame,
 } from '../../redux/modules/Scores';
 import GameCard from './components/GameCard';
-import UpdateGameCard from './components/updateGameCard';
 
 import styles from './styles';
 

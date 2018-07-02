@@ -339,6 +339,10 @@ class GameCard extends Component {
                                     ...this.state.home,
                                     batting: event.target.checked,
                                 },
+                                visitor: {
+                                    ...this.state.visitor,
+                                    batting: !event.target.checked,
+                                },
                             })
                         }
                     />&nbsp;
@@ -361,6 +365,10 @@ class GameCard extends Component {
                                 visitor: {
                                     ...this.state.visitor,
                                     batting: event.target.checked,
+                                },
+                                home: {
+                                    ...this.state.home,
+                                    batting: !event.target.checked,
                                 },
                             })
                         }
