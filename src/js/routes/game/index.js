@@ -13,7 +13,7 @@ import {
     finishGame,
     deleteGame,
 } from '../../redux/modules/Scores';
-import NewGameCard from './components/newGameCard';
+import GameCard from './components/GameCard';
 import UpdateGameCard from './components/updateGameCard';
 
 import styles from './styles';
@@ -97,27 +97,27 @@ class Game extends Component {
 
         if (!game.game_id) {
             return (
-                <NewGameCard eventId={game.id} submit={this.props.createGame} />
+                <GameCard eventId={game.id} submit={this.props.createGame} />
             );
         }
 
         if (game.game_id && !score.active) {
             return (
-                <UpdateGameCard
+                <GameCard
+                    eventId={game.id}
                     update={this.handleUpdate}
                     delete={this.handleDelete}
                     game={score}
-                    eventId={game.id}
                 />
             );
         }
 
         return (
-            <UpdateGameCard
+            <GameCard
+                eventId={game.id}
                 update={this.handleUpdate}
                 finish={this.handleFinish}
                 game={score}
-                eventId={game.id}
             />
         );
     };
