@@ -1,4 +1,4 @@
-import { takeEvery, put, call } from 'redux-saga/effects';
+import { takeEvery, put } from 'redux-saga/effects';
 
 import * as authUserModule from '../index';
 import * as scoresModule from '../../Scores';

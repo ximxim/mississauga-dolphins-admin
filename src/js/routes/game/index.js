@@ -96,7 +96,11 @@ class Game extends Component {
 
         if (!game.game_id) {
             return (
-                <GameCard eventId={game.id} submit={this.props.createGame} />
+                <GameCard
+                    loading={this.props.loadingScores}
+                    eventId={game.id}
+                    submit={this.props.createGame}
+                />
             );
         }
 
@@ -106,6 +110,7 @@ class Game extends Component {
                     eventId={game.id}
                     update={this.handleUpdate}
                     delete={this.handleDelete}
+                    loading={this.props.loadingScores}
                     game={score}
                 />
             );
@@ -116,6 +121,7 @@ class Game extends Component {
                 eventId={game.id}
                 update={this.handleUpdate}
                 finish={this.handleFinish}
+                loading={this.props.loadingScores}
                 game={score}
             />
         );
@@ -140,6 +146,7 @@ class Game extends Component {
 const mapStateToProps = (state, ownProps) => ({
     getEvent: () => getEventById(state, ownProps.match.params.id),
     getScoresByGameId: id => getScoresByGameId(state, id),
+    loadingScores: state.scores.loading,
 });
 
 const mapDispatchToProps = {

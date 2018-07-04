@@ -98,6 +98,8 @@ class GameCard extends Component {
                     className="btn-primary text-white btn-lg circle-btn-sm btn-block"
                     variant="raised"
                     onClick={this.handleCreateGame}
+                    disabled={this.props.loading}
+                    key="createGame"
                 >
                     Create Game
                 </Button>,
@@ -108,7 +110,9 @@ class GameCard extends Component {
                 <Button
                     className="btn-danger text-white btn-lg circle-btn-sm marginBottom btn-block"
                     variant="raised"
+                    disabled={this.props.loading}
                     onClick={() => this.props.delete(this.props.eventId)}
+                    key="deleteGame"
                 >
                     Delete Game
                 </Button>,
@@ -120,7 +124,9 @@ class GameCard extends Component {
                 <Button
                     className="btn-primary text-white btn-lg circle-btn-sm marginBottom btn-block"
                     variant="raised"
+                    disabled={this.props.loading}
                     onClick={this.handleUpdateGame}
+                    key="updateGame"
                 >
                     Update Game
                 </Button>,
@@ -131,7 +137,9 @@ class GameCard extends Component {
                 <Button
                     className="btn-danger text-white btn-lg circle-btn-sm marginBottom btn-block"
                     variant="raised"
+                    disabled={this.props.loading}
                     onClick={() => this.props.finish(this.props.eventId)}
+                    key="finishGame"
                 >
                     Finish Game
                 </Button>,
