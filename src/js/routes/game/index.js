@@ -86,7 +86,7 @@ class Game extends Component {
 
     renderGameMainContent = game => (
         <div className="col-md-8 padder">
-            <h2>{game.title}</h2>
+            <h2 className="text-center">{game.title}</h2>
             {this.renderScoringControls(game)}
         </div>
     );
