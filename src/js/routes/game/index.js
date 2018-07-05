@@ -97,6 +97,7 @@ class Game extends Component {
         if (!game.game_id) {
             return (
                 <GameCard
+                    players={this.props.players}
                     loading={this.props.loadingScores}
                     eventId={game.id}
                     submit={this.props.createGame}
@@ -107,6 +108,7 @@ class Game extends Component {
         if (game.game_id && !score.active) {
             return (
                 <GameCard
+                    players={this.props.players}
                     eventId={game.id}
                     update={this.handleUpdate}
                     delete={this.handleDelete}
@@ -118,6 +120,7 @@ class Game extends Component {
 
         return (
             <GameCard
+                players={this.props.players}
                 eventId={game.id}
                 update={this.handleUpdate}
                 finish={this.handleFinish}
@@ -144,6 +147,7 @@ class Game extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+    players: state.players.items,
     getEvent: () => getEventById(state, ownProps.match.params.id),
     getScoresByGameId: id => getScoresByGameId(state, id),
     loadingScores: state.scores.loading,

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, FormGroup, Input, Button, Table, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
+import Autosuggest from 'react-autosuggest';
 
 import ENV from '../../../../env';
 
@@ -20,6 +21,12 @@ class GameCard extends Component {
             overs: ENV.newGame.visitor.overs || '0',
             batting: ENV.newGame.visitor.batting || false,
         },
+        striker: ENV.newGame.striker || '',
+        nonStriker: ENV.newGame.nonStriker || '',
+        bowler: ENV.newGame.bowler || '',
+        strikerSuggestions: [],
+        nonStikerSuggestions: [],
+        bowlerSuggestions: [],
     };
 
     componentDidMount() {
@@ -79,6 +86,12 @@ class GameCard extends Component {
                                     <td>{this.renderHomeTeamBattingField()}</td>
                                     <td>
                                         {this.renderVisitorTeamBattingField()}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Striker</th>
+                                    <td colSpan="2">
+                                        {this.renderStrikerInput()}
                                     </td>
                                 </tr>
                             </tbody>
@@ -168,6 +181,26 @@ class GameCard extends Component {
                     }
                 />
             </FormGroup>
+        );
+    };
+
+    renderStrikerInput = () => {
+        const { striker, strikerSuggestions } = this.state;
+
+        return (
+            <Autosuggest
+                suggestions={strikerSuggestions}
+                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                getSuggestionValue={this.getSuggestionValue}
+                renderSuggestion={this.renderSuggestion}
+                alwaysRenderSuggestions
+                inputProps={{
+                    placeholder: 'Enter player name',
+                    value: striker,
+                    onChange: this.onStrikerChange,
+                }}
+            />
         );
     };
 
@@ -425,6 +458,46 @@ class GameCard extends Component {
             toast.error('Make sure all the fields are filled in');
             console.log(this.state);
         }
+    };
+
+    getSuggestions = value => {
+        const inputValue = value.trim().toLowerCase();
+        const inputLength = inputValue.length;
+
+        return inputLength === 0
+            ? []
+            : this.props.players.filter(
+                  player =>
+                      player.FIRST_NAME.toLowerCase().indexOf(value) >= 0 ||
+                      player.LAST_NAME.toLowerCase().indexOf(value) >= 0,
+              );
+    };
+
+    onStrikerChange = (event, { newValue }) => {
+        this.setState({ striker: newValue });
+    };
+
+    getSuggestionValue = player => `${player.FIRST_NAME} ${player.LAST_NAME}`;
+
+    renderSuggestion = player => {
+        console.log('render suggestions', player);
+        return (
+            <div>
+                {player.FIRST_NAME} {player.LAST_NAME}
+            </div>
+        );
+    };
+
+    onSuggestionsFetchRequested = ({ value }) => {
+        this.setState({
+            strikerSuggestions: this.getSuggestions(value),
+        });
+    };
+
+    onSuggestionsClearRequested = () => {
+        this.setState({
+            strikerSuggestions: [],
+        });
     };
 }
 
