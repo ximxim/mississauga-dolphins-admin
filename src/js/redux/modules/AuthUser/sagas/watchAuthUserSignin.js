@@ -7,18 +7,24 @@ import { getClient } from '../../../../utils/firebase';
 
 function attemptSignin({ username, password }) {
     const fClient = getClient();
-    return fClient.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then(() => {
-        return fClient.auth().signInWithEmailAndPassword(username, password).catch(error => error);
-    });
+    return fClient
+        .auth()
+        .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+        .then(() => {
+            return fClient
+                .auth()
+                .signInWithEmailAndPassword(username, password)
+                .catch(error => error);
+        });
 }
 
 export function* handleLogin(action) {
     const response = yield call(attemptSignin, action.payload);
-    if (response.uid) {
-        toast.success('LOGIN SUCCESSFUL');
+    if (response.user) {
+        toast.success('Login Successful');
     } else {
         yield put(authUserModule.requestLoginFailure(response));
-        toast.error('LOGIN FAILED');
+        toast.error(response.message);
     }
 }
 
