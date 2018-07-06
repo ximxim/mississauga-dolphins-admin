@@ -9,7 +9,7 @@ function createGame({ game, id }) {
     const fClient = getClient();
     const ref = fClient.database().ref(`/Games/${id}`);
     game.updated_at = moment().format();
-    return ref.set(game);
+    return ref.update(game);
 }
 
 export function* handleCreateGame({ payload }) {
