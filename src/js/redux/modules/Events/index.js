@@ -7,6 +7,9 @@ export const REQUEST_EVENTS_FAILURE = 'REQUEST_EVENTS_FAILURE';
 export const ADD_PLAYER = 'ADD_PLAYER';
 export const ADD_PLAYER_SUCCESS = 'ADD_PLAYER_SUCCESS';
 export const ADD_PLAYER_FAILURE = 'ADD_PLAYER_FAILURE';
+export const DELETE_PLAYER = 'DELETE_PLAYER';
+export const DELETE_PLAYER_SUCCESS = 'DELETE_PLAYER_SUCCESS';
+export const DELETE_PLAYER_FAILURE = 'DELETE_PLAYER_FAILURE';
 
 const initialState = {
     loading: false,
@@ -89,6 +92,32 @@ export default function reducer(state = initialState, action) {
                 error: action.payload.error,
             };
         }
+        case DELETE_PLAYER: {
+            return {
+                ...state,
+                loading: true,
+            };
+        }
+        case DELETE_PLAYER_SUCCESS: {
+            return {
+                ...state,
+                loading: false,
+                items: {
+                    ...state.items,
+                    [action.payload.eventId]: {
+                        ...state.items[action.payload.eventId],
+                        players: action.payload.players,
+                    },
+                },
+            };
+        }
+        case DELETE_PLAYER_FAILURE: {
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.error,
+            };
+        }
         default:
             return state;
     }
@@ -132,6 +161,27 @@ export function addPlayerSuccess(payload) {
 export function addPlayerFailure(error) {
     return {
         type: ADD_PLAYER_FAILURE,
+        error,
+    };
+}
+
+export function deletePlayer(payload) {
+    return {
+        type: DELETE_PLAYER,
+        payload,
+    };
+}
+
+export function deletePlayerSuccess(payload) {
+    return {
+        type: DELETE_PLAYER_SUCCESS,
+        payload,
+    };
+}
+
+export function deletePlayerFailure(error) {
+    return {
+        type: DELETE_PLAYER_FAILURE,
         error,
     };
 }

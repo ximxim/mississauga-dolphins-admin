@@ -22,7 +22,7 @@ import {
     finishGame,
     deleteGame,
 } from '../../redux/modules/Scores';
-import { addPlayer } from '../../redux/modules/Events';
+import { addPlayer, deletePlayer } from '../../redux/modules/Events';
 
 import GameCard from './components/GameCard';
 import PlayersSuggestInput from './components/PlayersSuggestInput';
@@ -107,7 +107,6 @@ class Game extends Component {
             {this.renderScoringControls(game)}
             <h2 className="text-center">Players List</h2>
             {this.renderAddPlayersControl()}
-            {this.renderPlayersList()}
         </div>
     );
 
@@ -129,17 +128,19 @@ class Game extends Component {
                                 this.setState({ playerName: newValue })
                             }
                         />
-                        <br />
                         <Button
-                            className="btn-success text-white btn-lg circle-btn-sm btn-block"
+                            className="btn-success text-white btn-md circle-btn-sm btn-block"
                             variant="raised"
                             onClick={this.handleAddPlayer}
                             disabled={!playerName || this.props.loadingEvents}
+                            style={{ marginTop: 10 }}
                             key="addPlayer"
                         >
                             Add Player
                         </Button>
+                        <br />
                     </Form>
+                    {this.renderPlayersList()}
                 </div>
             </div>
         );
@@ -199,18 +200,13 @@ class Game extends Component {
         this.props.deleteGame({ id: selectedGame.id, game: selectedGame });
     };
 
-    handleAddPlayer = () => {
-        const eventId = this.props.match.params.id;
-        const playerId = this.state.selectedPlayer;
-
-        this.props.addPlayer({ eventId, playerId });
-        this.setState({ selectedPlayer: '', playerName: '' });
-    };
-
     renderPlayersList = () => {
         const event = this.props.getEvent();
         const playersList = this.props.players || [];
-        if (event.players.length === 0) return <p>No players</p>;
+        if (!event.players)
+            return (
+                <p className="text-center">No players added to this event</p>
+            );
 
         return (
             <ListGroup>
@@ -221,11 +217,34 @@ class Game extends Component {
                     return (
                         <ListGroupItem key={player.id}>
                             {player.FIRST_NAME} {player.LAST_NAME}
+                            <Button
+                                className="close"
+                                onClick={() =>
+                                    this.handleDeletePlayer(player.id)
+                                }
+                                disabled={this.props.loadingEvents}
+                            >
+                                <span aria-hidden="true">&times;</span>
+                            </Button>
                         </ListGroupItem>
                     );
                 })}
             </ListGroup>
         );
+    };
+
+    handleAddPlayer = () => {
+        const eventId = this.props.match.params.id;
+        const playerId = this.state.selectedPlayer;
+
+        this.props.addPlayer({ eventId, playerId });
+        this.setState({ selectedPlayer: '', playerName: '' });
+    };
+
+    handleDeletePlayer = playerId => {
+        const eventId = this.props.match.params.id;
+
+        this.props.deletePlayer({ eventId, playerId });
     };
 }
 
@@ -243,6 +262,7 @@ const mapDispatchToProps = {
     finishGame,
     deleteGame,
     addPlayer,
+    deletePlayer,
 };
 
 export default connect(
