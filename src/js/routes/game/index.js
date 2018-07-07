@@ -219,7 +219,7 @@ class Game extends Component {
                     if (!player) return null;
 
                     return (
-                        <ListGroupItem>
+                        <ListGroupItem key={player.id}>
                             {player.FIRST_NAME} {player.LAST_NAME}
                         </ListGroupItem>
                     );
