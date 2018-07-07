@@ -1,9 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Table, Breadcrumb, BreadcrumbItem } from 'reactstrap';
+import {
+    Table,
+    Breadcrumb,
+    BreadcrumbItem,
+    Form,
+    Button,
+    ListGroup,
+    ListGroupItem,
+} from 'reactstrap';
 import * as FontAwesome from 'react-icons/lib/fa';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
+import _ from 'lodash';
 
 import requiresAuth from '../../utils/requiresAuth';
 import { getEventById, getScoresByGameId } from '../../redux/selectors';
@@ -13,11 +22,19 @@ import {
     finishGame,
     deleteGame,
 } from '../../redux/modules/Scores';
+import { addPlayer } from '../../redux/modules/Events';
+
 import GameCard from './components/GameCard';
+import PlayersSuggestInput from './components/PlayersSuggestInput';
 
 import styles from './styles';
 
 class Game extends Component {
+    state = {
+        playerName: '',
+        selectedPlayer: -1,
+    };
+
     render() {
         const event = this.props.getEvent();
         if (!event) return null;
@@ -88,8 +105,45 @@ class Game extends Component {
         <div className="col-md-8 padder">
             <h2 className="text-center">{game.title}</h2>
             {this.renderScoringControls(game)}
+            <h2 className="text-center">Players List</h2>
+            {this.renderAddPlayersControl()}
+            {this.renderPlayersList()}
         </div>
     );
+
+    renderAddPlayersControl = () => {
+        const { playerName } = this.state;
+
+        return (
+            <div className="card" style={{ margin: 10 }}>
+                <div className="card-body">
+                    <Form>
+                        <PlayersSuggestInput
+                            players={this.props.players}
+                            placeholder="Enter a player name"
+                            value={playerName}
+                            onSuggestionSelected={(event, { suggestion }) =>
+                                this.setState({ selectedPlayer: suggestion.id })
+                            }
+                            onChange={(event, { newValue }) =>
+                                this.setState({ playerName: newValue })
+                            }
+                        />
+                        <br />
+                        <Button
+                            className="btn-success text-white btn-lg circle-btn-sm btn-block"
+                            variant="raised"
+                            onClick={this.handleAddPlayer}
+                            disabled={!playerName || this.props.loadingEvents}
+                            key="addPlayer"
+                        >
+                            Add Player
+                        </Button>
+                    </Form>
+                </div>
+            </div>
+        );
+    };
 
     renderScoringControls = game => {
         const score = this.props.getScoresByGameId(game.id);
@@ -144,6 +198,35 @@ class Game extends Component {
         const selectedGame = this.props.getScoresByGameId(eventId);
         this.props.deleteGame({ id: selectedGame.id, game: selectedGame });
     };
+
+    handleAddPlayer = () => {
+        const eventId = this.props.match.params.id;
+        const playerId = this.state.selectedPlayer;
+
+        this.props.addPlayer({ eventId, playerId });
+        this.setState({ selectedPlayer: '', playerName: '' });
+    };
+
+    renderPlayersList = () => {
+        const event = this.props.getEvent();
+        const playersList = this.props.players || [];
+        if (event.players.length === 0) return <p>No players</p>;
+
+        return (
+            <ListGroup>
+                {_.map(event.players, id => {
+                    const player = playersList[id];
+                    if (!player) return null;
+
+                    return (
+                        <ListGroupItem>
+                            {player.FIRST_NAME} {player.LAST_NAME}
+                        </ListGroupItem>
+                    );
+                })}
+            </ListGroup>
+        );
+    };
 }
 
 const mapStateToProps = (state, ownProps) => ({
@@ -151,6 +234,7 @@ const mapStateToProps = (state, ownProps) => ({
     getEvent: () => getEventById(state, ownProps.match.params.id),
     getScoresByGameId: id => getScoresByGameId(state, id),
     loadingScores: state.scores.loading,
+    loadingEvents: state.events.loading,
 });
 
 const mapDispatchToProps = {
@@ -158,6 +242,7 @@ const mapDispatchToProps = {
     updateGame,
     finishGame,
     deleteGame,
+    addPlayer,
 };
 
 export default connect(

@@ -3,6 +3,7 @@ import { Form, FormGroup, Input, Button, Table, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
 import Autosuggest from 'react-autosuggest';
 
+import PlayersSuggestInput from './PlayersSuggestInput';
 import styles from './styles';
 import ENV from '../../../../env';
 
@@ -25,7 +26,6 @@ class GameCard extends Component {
         striker: ENV.newGame.striker || '',
         nonStriker: ENV.newGame.nonStriker || '',
         bowler: ENV.newGame.bowler || '',
-        playersSuggestion: [],
     };
 
     componentDidMount() {
@@ -196,64 +196,49 @@ class GameCard extends Component {
     };
 
     renderStrikerInput = () => {
-        const { striker, playersSuggestion } = this.state;
+        const { striker } = this.state;
+        const { players } = this.props;
 
         return (
-            <Autosuggest
-                suggestions={playersSuggestion}
-                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                getSuggestionValue={this.getSuggestionValue}
-                renderSuggestion={this.renderSuggestion}
-                theme={styles.autoSuggestTheme}
-                inputProps={{
-                    placeholder: 'Enter a player name',
-                    value: striker,
-                    onChange: (event, { newValue }) =>
-                        this.setState({ striker: newValue }),
-                }}
+            <PlayersSuggestInput
+                players={players}
+                value={striker}
+                onChange={(event, { newValue }) =>
+                    this.setState({ striker: newValue })
+                }
+                placeholder="Entere a player name"
             />
         );
     };
 
     renderNonStrikerInput = () => {
-        const { nonStriker, playersSuggestion } = this.state;
+        const { nonStriker } = this.state;
+        const { players } = this.props;
 
         return (
-            <Autosuggest
-                suggestions={playersSuggestion}
-                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                getSuggestionValue={this.getSuggestionValue}
-                renderSuggestion={this.renderSuggestion}
-                theme={styles.autoSuggestTheme}
-                inputProps={{
-                    placeholder: 'Enter a player name',
-                    value: nonStriker,
-                    onChange: (event, { newValue }) =>
-                        this.setState({ nonStriker: newValue }),
-                }}
+            <PlayersSuggestInput
+                players={players}
+                value={nonStriker}
+                onChange={(event, { newValue }) =>
+                    this.setState({ nonStriker: newValue })
+                }
+                placeholder="Enter a player name"
             />
         );
     };
 
     renderBowlerInput = () => {
-        const { bowler, playersSuggestion } = this.state;
+        const { bowler } = this.state;
+        const { players } = this.props;
 
         return (
-            <Autosuggest
-                suggestions={playersSuggestion}
-                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                getSuggestionValue={this.getSuggestionValue}
-                renderSuggestion={this.renderSuggestion}
-                theme={styles.autoSuggestTheme}
-                inputProps={{
-                    placeholder: 'Enter a player name',
-                    value: bowler,
-                    onChange: (event, { newValue }) =>
-                        this.setState({ bowler: newValue }),
-                }}
+            <PlayersSuggestInput
+                players={players}
+                value={bowler}
+                onChange={(event, { newValue }) =>
+                    this.setState({ bowler: newValue })
+                }
+                placeholder="Enter a player name"
             />
         );
     };
@@ -511,42 +496,6 @@ class GameCard extends Component {
         } else {
             toast.error('Make sure all the fields are filled in');
         }
-    };
-
-    getSuggestions = value => {
-        const inputValue = value.trim().toLowerCase();
-        const inputLength = inputValue.length;
-
-        return inputLength === 0
-            ? []
-            : this.props.players.filter(
-                  player =>
-                      player.FIRST_NAME.toLowerCase().indexOf(inputValue) >=
-                          0 ||
-                      player.LAST_NAME.toLowerCase().indexOf(inputValue) >= 0,
-              );
-    };
-
-    getSuggestionValue = player => `${player.FIRST_NAME} ${player.LAST_NAME}`;
-
-    renderSuggestion = player => {
-        return (
-            <div>
-                {player.FIRST_NAME} {player.LAST_NAME}
-            </div>
-        );
-    };
-
-    onSuggestionsFetchRequested = ({ value }) => {
-        this.setState({
-            playersSuggestion: this.getSuggestions(value),
-        });
-    };
-
-    onSuggestionsClearRequested = () => {
-        this.setState({
-            playersSuggestion: [],
-        });
     };
 }
 
