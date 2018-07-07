@@ -156,6 +156,9 @@ class Game extends Component {
                     loading={this.props.loadingScores}
                     eventId={game.id}
                     submit={this.props.createGame}
+                    addPlayer={selectedPlayer =>
+                        this.setState({ selectedPlayer }, this.handleAddPlayer)
+                    }
                 />
             );
         }
@@ -169,6 +172,9 @@ class Game extends Component {
                     delete={this.handleDelete}
                     loading={this.props.loadingScores}
                     game={score}
+                    addPlayer={selectedPlayer =>
+                        this.setState({ selectedPlayer }, this.handleAddPlayer)
+                    }
                 />
             );
         }
@@ -181,6 +187,9 @@ class Game extends Component {
                 finish={this.handleFinish}
                 loading={this.props.loadingScores}
                 game={score}
+                addPlayer={selectedPlayer =>
+                    this.setState({ selectedPlayer }, this.handleAddPlayer)
+                }
             />
         );
     };

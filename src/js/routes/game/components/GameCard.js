@@ -203,10 +203,13 @@ class GameCard extends Component {
             <PlayersSuggestInput
                 players={players}
                 value={striker}
+                placeholder="Entere a player name"
+                onSuggestionSelected={(event, { suggestion }) =>
+                    this.props.addPlayer(suggestion.id)
+                }
                 onChange={(event, { newValue }) =>
                     this.setState({ striker: newValue })
                 }
-                placeholder="Entere a player name"
             />
         );
     };
@@ -219,10 +222,13 @@ class GameCard extends Component {
             <PlayersSuggestInput
                 players={players}
                 value={nonStriker}
+                placeholder="Enter a player name"
+                onSuggestionSelected={(event, { suggestion }) =>
+                    this.props.addPlayer(suggestion.id)
+                }
                 onChange={(event, { newValue }) =>
                     this.setState({ nonStriker: newValue })
                 }
-                placeholder="Enter a player name"
             />
         );
     };
@@ -235,10 +241,13 @@ class GameCard extends Component {
             <PlayersSuggestInput
                 players={players}
                 value={bowler}
+                placeholder="Enter a player name"
+                onSuggestionSelected={(event, { suggestion }) =>
+                    this.props.addPlayer(suggestion.id)
+                }
                 onChange={(event, { newValue }) =>
                     this.setState({ bowler: newValue })
                 }
-                placeholder="Enter a player name"
             />
         );
     };
